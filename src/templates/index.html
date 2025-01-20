@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulation Controller </title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+</head>
+
+<body>
+    <h3>Simulation Control Dashboard</h3>
+    <div class="content">
+        <div>
+            <div class="row">
+                <!-- First column -->
+                <div class="col-md-5">
+                    <p><strong>Simulation Controller |</strong> <span id="sim-server-container"></span> <span
+                            style="color:green">Running</span></p>
+                </div>
+                <!-- Second column -->
+                <div class="col">
+                    <div class="server-info-wrapper">
+                        <span class="mx-2"><strong>Connected Simulation Servers |</strong></span>
+                        <span>
+                            <div id="server-container" class="server-info">
+                                <!-- Server list generated here -->
+                            </div>
+                        </span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Comparison Plots Section  -->
+        <div class="comparison-plots">
+            <div class="value-label plot-main-heading">Vessel Positions</div>
+            <div class="plot-row">
+                <div class="plot-block" id="comparisonXYRef"></div>
+                <div class="plot-block" id="comparisonXYAct"></div>
+            </div>
+        </div>
+
+
+        <!-- Server-specific Plots -->
+        <div id="plots-container">
+            <!-- Plot blocks for each server will be generated here -->
+        </div>
+    </div>
+
+    <script>
+        let servers = [];
+        let referenceInterval = null;
+        $('#sim-server-container').append(`<span>${self.location.host}</span>`);
+        initializeComparisonPlots();
+        startGettingReferences();
+
+        function startGettingReferences() {
+            if (!referenceInterval) {
+                referenceInterval = setInterval(function () {
+                    $.ajax({
+                        url: '/plot_data',
+                        type: 'GET',
+                        contentType: 'application/json',
+                        success: function (response) {
+                            response.forEach(simulation => {
+                                const serverId = simulation.ssid.ip + ':' + simulation.ssid.port;
+                                if (!servers.includes(serverId)) {
+                                    servers.push(serverId);
+                                    initializeServerBlock(serverId);
+
+                                }
+                                updateStatus(serverId, simulation);
+                                updatePlots(serverId, simulation);
+                                updateComparisonPlots(simulation);
+                            });
+                        },
+                        error: function (error) {
+                            console.log("Error fetching values: ", error);
+                        }
+                    });
+                }, 1000);
+            }
+        }
+
+        function initializeServerBlock(serverId) {
+            $('#server-container').append(`<div><span>${serverId}</span></div>`);
+
+            $('#plots-container').append(`
+                <div class="server-block">
+                    <div class="value-label plot-main-heading">Server: ${serverId}</div>
+                    
+                    <div>
+                        <div class="value-row">
+                            <span class="value-label">Current Time</span>
+                            <span id="currentTime-${serverId}">0</span>
+                        </div>
+                        <div class="value-row">
+                            <span class="value-label">Waypoints</span>
+                            <span id="waypoints-${serverId}">No Waypoints</span>
+                        </div>
+                        <div class="value-row">
+                            <span class="value-label">Reference Values</span>
+                            <span>x_ref: <span id="xRef-${serverId}">0.00</span>, y_ref: <span id="yRef-${serverId}">0.00</span>, psi_ref: <span id="psiRef-${serverId}">0.00</span></span>
+                        </div>
+                        <div class="value-row">
+                            <span class="value-label">Actual Values:</span>
+                            <span>x_act: <span id="xAct-${serverId}">0.00</span>, y_act: <span id="yAct-${serverId}">0.00</span>, psi_act: <span id="psiAct-${serverId}">0.00</span></span>
+                        </div>
+                    </div>
+                    <div id="plot-row-${serverId}" class="graphs">
+                        <div class="plot-block" id="plotX-${serverId}"></div>
+                        <hr/>
+                        <div class="plot-block" id="plotY-${serverId}"></div>
+                        <hr/>  
+                        <div class="plot-block" id="plotXYRef-${serverId}"></div>
+                        <hr/>
+                        <div class="plot-block" id="plotXYAct-${serverId}"></div>
+                        <hr/>
+                        <div class="plot-block" id="plotPsi-${serverId}"></div>
+                    </div>
+                </div>
+            `);
+
+            initializePlots(serverId);
+        }
+
+        function initializePlots(serverId) {
+            const layoutX = {
+                title: `X values for Server: ${serverId}`,
+                xaxis: { title: 'Time (s)', autoarange: true },
+                yaxis: { title: 'X values (m)', autoarange: true },
+                showlegend: true,
+                autosize: true,
+                margin: {
+                    l: 40, r: 10, t: 30, b: 40
+                }
+            };
+
+            const layoutY = {
+                title: `Y values for Server: ${serverId}`,
+                xaxis: { title: 'Time (s)', autoarange: true },
+                yaxis: { title: 'Y values (m)', autoarange: true },
+                showlegend: true,
+                autosize: true,
+                margin: {
+                    l: 40, r: 10, t: 30, b: 40
+                }
+            };
+
+            const layoutXYRef = {
+                title: `X_ref vs Y_ref for Server: ${serverId}`,
+                xaxis: { title: 'X_ref (m)', autoarange: true },
+                yaxis: { title: 'Y_ref (m)', autoarange: true },
+                showlegend: true,
+                autosize: true,
+                margin: {
+                    l: 40, r: 10, t: 30, b: 40
+                }
+            };
+
+            const layoutXYAct = {
+                title: `X_act vs Y_act for Server: ${serverId}`,
+                xaxis: { title: 'X_act (m)', autoarange: true },
+                yaxis: { title: 'Y_act (m)', autoarange: true },
+                showlegend: true,
+                autosize: true,
+                margin: {
+                    l: 40, r: 10, t: 30, b: 40
+                }
+            };
+
+            const layoutPsi = {
+                title: `Psi values for Server: ${serverId}`,
+                xaxis: { title: 'Time (s)', autoarange: true },
+                yaxis: { title: 'Psi values (rad)', autoarange: true },
+                showlegend: true,
+                autosize: true,
+                margin: {
+                    l: 40, r: 10, t: 30, b: 40
+                }
+            };
+
+            Plotly.newPlot(`plotX-${serverId}`, [{ x: [], y: [], mode: 'lines', name: 'x_ref' }, { x: [], y: [], mode: 'lines', name: 'x_act' }, { x: [], y: [], mode: 'lines', name: 'x_wp' }], layoutX);
+            Plotly.newPlot(`plotY-${serverId}`, [{ x: [], y: [], mode: 'lines', name: 'y_ref' }, { x: [], y: [], mode: 'lines', name: 'y_act' }, { x: [], y: [], mode: 'lines', name: 'y_wp' }], layoutY);
+            Plotly.newPlot(`plotXYRef-${serverId}`, [{ x: [], y: [], mode: 'lines', name: 'x_ref vs y_ref' }], layoutXYRef);
+            Plotly.newPlot(`plotXYAct-${serverId}`, [{ x: [], y: [], mode: 'lines', name: 'x_act vs y_act' }], layoutXYAct);
+            Plotly.newPlot(`plotPsi-${serverId}`, [{ x: [], y: [], mode: 'lines', name: 'psi_ref' }, { x: [], y: [], mode: 'lines', name: 'psi_act' }, { x: [], y: [], mode: 'lines', name: 'psi_wp' }], layoutPsi);
+        }
+
+        function updateStatus(serverId, simulation) {
+            document.getElementById(`currentTime-${serverId}`).innerText = (simulation.time ?? '0').toFixed(0);
+            document.getElementById(`waypoints-${serverId}`).innerText = 'x_wp: ' + (simulation.x_wp ?? 0).toFixed(2) +
+                ' , y_wp: ' + (simulation.y_wp ?? 0).toFixed(2) + ' , psi_wp: ' + (simulation.psi_wp ?? 0).toFixed(2);
+            document.getElementById(`xRef-${serverId}`).innerText = (simulation?.x_ref ?? 0).toFixed(2);
+            document.getElementById(`yRef-${serverId}`).innerText = (simulation?.y_ref ?? 0).toFixed(2);
+            document.getElementById(`psiRef-${serverId}`).innerText = (simulation?.psi_ref ?? 0).toFixed(2);
+            document.getElementById(`xAct-${serverId}`).innerText = (simulation?.x_act ?? 0).toFixed(2);
+            document.getElementById(`yAct-${serverId}`).innerText = (simulation?.y_act ?? 0).toFixed(2);
+            document.getElementById(`psiAct-${serverId}`).innerText = (simulation?.psi_act ?? 0).toFixed(2);
+        }
+
+        let previousTimestamps = {};
+
+        function updatePlots(serverId, simulation) {
+            if (simulation.start_plot) {
+                const time = simulation.time;
+                if (previousTimestamps[serverId] !== time) {
+                    previousTimestamps[serverId] = time;
+
+                    Plotly.extendTraces(`plotX-${serverId}`, {
+                        x: [[time], [time], [time]],
+                        y: [[simulation.x_ref], [simulation.x_act], [simulation.x_wp]]
+                    }, [0, 1, 2]);
+
+                    Plotly.extendTraces(`plotY-${serverId}`, {
+                        x: [[time], [time], [time]],
+                        y: [[simulation.y_ref], [simulation.y_act], [simulation.y_wp]]
+                    }, [0, 1, 2]);
+
+                    Plotly.extendTraces(`plotXYRef-${serverId}`, {
+                        x: [[simulation.x_ref]],
+                        y: [[simulation.y_ref]]
+                    }, [0]);
+
+                    Plotly.extendTraces(`plotXYAct-${serverId}`, {
+                        x: [[simulation.x_act]],
+                        y: [[simulation.y_act]]
+                    }, [0]);
+
+                    Plotly.extendTraces(`plotPsi-${serverId}`, {
+                        x: [[time], [time], [time]],
+                        y: [[simulation.psi_ref], [simulation.psi_act], [simulation.psi_wp]]
+                    }, [0, 1, 2]);
+                }
+            }
+        }
+
+        function initializeComparisonPlots() {
+            const layoutXYRef = {
+                title: 'Combined X_ref vs Y_ref',
+                xaxis: { title: 'X_ref (m)', autoarange: true },
+                yaxis: { title: 'Y_ref (m)', autoarange: true },
+                showlegend: true,
+                autosize: true,
+                margin: {
+                    l: 40, r: 10, t: 30, b: 40
+                }
+            };
+
+            const layoutXYAct = {
+                title: 'Combined X_act vs Y_act',
+                xaxis: { title: 'X_act (m)', autoarange: true },
+                yaxis: { title: 'Y_act (m)', autoarange: true },
+                showlegend: true,
+                autosize: true,
+                margin: {
+                    l: 40, r: 10, t: 30, b: 40
+                }
+
+            };
+
+            Plotly.newPlot('comparisonXYRef', [{ x: [], y: [], mode: 'lines', name: 'Vessel 1' }, { x: [], y: [], mode: 'lines', name: 'Vessel 2' }], layoutXYRef);
+            Plotly.newPlot('comparisonXYAct', [{ x: [], y: [], mode: 'lines', name: 'Vessel 1' }, { x: [], y: [], mode: 'lines', name: 'Vessel 2' }], layoutXYAct);
+        }
+
+        function updateComparisonPlots(simulation) {
+            if (simulation.start_plot) {
+                const serverIndex = servers.indexOf(simulation.ssid.ip + ':' + simulation.ssid.port);
+                if (serverIndex >= 0) {
+                    Plotly.extendTraces('comparisonXYRef', { x: [[simulation.x_ref]], y: [[simulation.y_ref]] }, [serverIndex]);
+                    Plotly.extendTraces('comparisonXYAct', { x: [[simulation.x_act]], y: [[simulation.y_act]] }, [serverIndex]);
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,2 @@
+ssid,time,x_ref,y_ref,psi_ref,x_act,y_act,psi_act,x_wp,y_wp,psi_wp,start_plot,x_tp,y_tp,psi_tp
+"{'ip': '127.0.0.1', 'port': 5001}",0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,False,,,

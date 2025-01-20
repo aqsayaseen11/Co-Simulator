@@ -1,0 +1,151 @@
+{
+  "description": "Set position and heading setpoints",
+  "defaults": {
+    "model": "Reference Generator",
+    "action": "override"
+  },
+  "events": [
+    {
+      "time": 50,
+      "variable": "x_wp",
+      "value": 10.0
+    },
+    {
+      "time": 50,
+      "variable": "x_tp",
+      "value": 150.0
+    },
+    {
+      "time": 60,
+      "variable": "y_wp",
+      "value": 5.0
+    },
+    {
+      "time": 60,
+      "variable": "y_tp",
+      "value": 180.0
+    },
+    {
+      "time": 200,
+      "variable": "x_wp",
+      "value": 15.0
+    },
+    {
+      "time": 200,
+      "variable": "x_tp",
+      "value": 350.0
+    },
+    {
+      "time": 210,
+      "variable": "y_wp",
+      "value": 15.0
+    },
+    {
+      "time": 210,
+      "variable": "y_tp",
+      "value":360.0
+    },
+    {
+      "time": 380,
+      "variable": "x_wp",
+      "value": 20.0
+    },
+    {
+      "time": 380,
+      "variable": "x_tp",
+      "value": 580.0
+    },
+    {
+      "time": 390,
+      "variable": "y_wp",
+      "value": 20.0
+    },
+    {
+      "time": 390,
+      "variable": "y_tp",
+      "value": 590.0
+    },
+    {
+      "time": 710,
+      "variable": "x_wp",
+      "value": 30.0
+    },
+    {
+      "time": 710,
+      "variable": "x_tp",
+      "value": 910.0
+    },
+    {
+      "time": 800,
+      "variable": "y_wp",
+      "value": 30.0
+    },
+    {
+      "time": 800,
+      "variable": "y_tp",
+      "value": 1000.0
+    },
+    {
+      "time": 750,
+      "variable": "psi_wp",
+      "value": 1.5
+    },
+    {
+      "time": 750,
+      "variable": "psi_tp",
+      "value": 950.0
+    },
+    {
+      "time": 950,
+      "variable": "x_wp",
+      "value": 40.0
+    },
+    {
+      "time": 950,
+      "variable": "x_tp",
+      "value": 1050.0
+    },
+    {
+      "time": 1050,
+      "variable": "y_wp",
+      "value": 35.0
+    },
+    {
+      "time": 1050,
+      "variable": "y_tp",
+      "value": 1450.0
+    },
+    {
+      "time": 1500,
+      "variable": "y_wp",
+      "value": 40.0
+    },
+    {
+      "time": 1500,
+      "variable": "y_tp",
+      "value": 1900.0
+    },
+    {
+      "time": 1950,
+      "variable": "y_wp",
+      "value": 50.0
+    },
+    {
+      "time": 1950,
+      "variable": "y_tp",
+      "value": 2350.0
+    },
+    {
+      "time": 2400,
+      "variable": "y_wp",
+      "value": 60.0
+    },
+    {
+      "time": 2400,
+      "variable": "y_tp",
+      "value": 2800.0
+    }
+  ],
+  "end": 3000
+}
+

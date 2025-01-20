@@ -1,0 +1,163 @@
+{
+    "description": "Set position and heading setpoints",
+    "defaults": {
+      "model": "Reference Generator",
+      "action": "override"
+    },
+    "events": [
+      {
+        "time": 50,
+        "variable": "y_wp",
+        "value": 10.0
+      },
+      {
+        "time": 50,
+        "variable": "y_tp",
+        "value": 150.0
+      },
+      {
+        "time": 60,
+        "variable": "x_wp",
+        "value": 5.0
+      },
+      {
+        "time": 60,
+        "variable": "x_tp",
+        "value": 180.0
+      },
+      {
+        "time": 210,
+        "variable": "y_wp",
+        "value": 15
+      },
+      {
+        "time": 210,
+        "variable": "y_tp",
+        "value": 360.0
+      },
+      {
+        "time": 380,
+        "variable": "y_wp",
+        "value": 20.0
+      },
+      {
+        "time": 380,
+        "variable": "y_tp",
+        "value": 580.0
+      },
+      {
+        "time": 610,
+        "variable": "y_wp",
+        "value": 30.0
+      },
+      {
+        "time": 610,
+        "variable": "y_tp",
+        "value": 910.0
+      },
+      {
+        "time": 800,
+        "variable": "psi_wp",
+        "value": 1.5
+      },
+      {
+        "time": 800,
+        "variable": "psi_tp",
+        "value": 1000.0
+      },
+      {
+        "time": 950,
+        "variable": "y_wp",
+        "value": 35.0
+      },
+      {
+        "time": 950,
+        "variable": "y_tp",
+        "value": 1050.0
+      },
+      {
+        "time": 450,
+        "variable": "x_wp",
+        "value": 10.0
+      },
+      {
+        "time": 450,
+        "variable": "x_tp",
+        "value": 850.0
+      },
+      {
+        "time": 1110,
+        "variable": "y_wp",
+        "value": 40.0
+      },
+      {
+        "time": 1110,
+        "variable": "y_tp",
+        "value": 1510.0
+      },
+      {
+        "time": 860,
+        "variable": "x_wp",
+        "value": 25.0
+      },
+      {
+        "time": 860,
+        "variable": "x_tp",
+        "value": 1260.0
+      },
+      {
+        "time": 900,
+        "variable": "psi_wp",
+        "value": 1.5
+      },
+      {
+        "time": 900,
+        "variable": "psi_tp",
+        "value": 1300.0
+      },
+      {
+        "time": 1310,
+        "variable": "x_wp",
+        "value": 40.0
+      },
+      {
+        "time": 1310,
+        "variable": "x_tp",
+        "value": 1810.0
+      },
+      {
+        "time": 1700,
+        "variable": "psi_wp",
+        "value": -1.5
+      },
+      {
+        "time": 1700,
+        "variable": "psi_tp",
+        "value": 1850.0
+      },
+      {
+        "time": 1800,
+        "variable": "y_wp",
+        "value": 20.0
+      },
+      {
+        "time": 1800,
+        "variable": "y_tp",
+        "value": 2050.0
+      },
+
+      {
+        "time": 2000,
+        "variable": "x_wp",
+        "value": 60.0
+      },
+      {
+        "time": 2000,
+        "variable": "x_tp",
+        "value": 2100.0
+      }
+    ],
+    "end": 3000
+  }
+  
+  
